@@ -8,4 +8,5 @@
 
 Zombie.destroy_all
 
-Zombie.create!(name: 'Lica', weapon: 'pauzinho de bolinha')
+Zombie.create!(name: 'Ash', weapon: 'axe')
+Zombie.create!(name: 'John', weapon: 'shotgun')
