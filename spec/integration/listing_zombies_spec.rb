@@ -15,7 +15,16 @@ describe 'zombies api', type: :request do
       expect(response.body).to_not be_empty
     end
 
-    context 'when a query to filter zombies with a specific weapon is is sent' do
+    it 'returns zombies by id' do
+      zombie_ash = Zombie.create!(name: 'Ash', weapon: 'axe')
+
+      get "/zombies/#{zombie_ash.id}"
+      expect(response.status).to eq 200
+      zombie = json(response.body)
+      expect(zombie["name"]).to eq zombie_ash.name
+    end
+
+    context 'when querying zombies with a specific weapon' do
       it 'returns only the zombies with that weapon' do
         Zombie.create!(name: 'Ash', weapon: 'axe')
         Zombie.create!(name: 'John', weapon: 'shotgun')
@@ -23,7 +32,7 @@ describe 'zombies api', type: :request do
         get '/zombies?weapon=axe'
 
         expect(response.status).to eq 200
-        zombies = JSON.parse(response.body).collect { |z| z["name"] }
+        zombies = json(response.body).collect { |z| z["name"] }
         expect(zombies).to include 'Ash'
         expect(zombies).to_not include 'John'
       end

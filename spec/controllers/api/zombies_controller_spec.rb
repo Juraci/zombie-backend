@@ -2,7 +2,6 @@ require 'rails_helper'
 
 describe API::ZombiesController, type: :controller do
   describe 'GET #index' do
-
     before :example do
       @zombie = Zombie.create!(name: 'Ash', weapon: 'axe')
     end
@@ -28,6 +27,19 @@ describe API::ZombiesController, type: :controller do
         get :index, params
         expect(response.body).to eq([@zombie].to_json)
       end
+    end
+  end
+
+  describe 'GET #show' do
+    before :example do
+      @zombie = Zombie.create!(name: 'Ash', weapon: 'axe')
+      @params = { id: @zombie.id }
+    end
+
+    it 'returns zombies by id' do
+      get :show, @params
+      expect(response.status).to eq 200
+      expect(response.body).to eq(@zombie.to_json)
     end
   end
 end
