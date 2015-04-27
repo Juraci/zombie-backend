@@ -3,10 +3,20 @@ require 'rails_helper'
 describe 'zombies api', type: :request do
   before :example do
     host! 'api.example.com'
+    @schema = {
+        type: "object",
+        required: ["name", "weapon", "created_at", "updated_at", "id"],
+        properties: {
+          name: { type: "string" },
+          weapon: { type: "string" },
+          created_at: { type: "string" },
+          updated_at: { type: "string" },
+          id: { type: "integer" }
+        }
+      }
   end
 
   context 'when a get request is sent to "/zombies" URI' do
-
 
     context 'when the accepted content type is JSON' do
       it 'returns list of all zombies' do
@@ -15,7 +25,7 @@ describe 'zombies api', type: :request do
         get '/zombies', { format: 'json' }
 
         expect(response.status).to eq 200
-        expect(response.content_type).to eq Mime::JSON
+        expect(JSON::Validator.fully_validate(@schema, response.body, strict: true, list: true)).to be_empty
       end
     end
 
@@ -40,22 +50,10 @@ describe 'zombies api', type: :request do
     end
 
     it 'should be valid against the contract' do
-      schema = {
-        type: "object",
-        required: ["name", "weapon", "created_at", "updated_at", "id"],
-        properties: {
-          name: { type: "string" },
-          weapon: { type: "string" },
-          created_at: { type: "string" },
-          updated_at: { type: "string" },
-          id: { type: "integer" }
-        }
-      }
-
       zombie_ash = Zombie.create!(name: 'Ash', weapon: 'axe')
       get "/zombies/#{zombie_ash.id}"
 
-      expect(JSON::Validator.fully_validate(schema, response.body, strict: true)).to be_empty
+      expect(JSON::Validator.fully_validate(@schema, response.body, strict: true)).to be_empty
 
     end
 
