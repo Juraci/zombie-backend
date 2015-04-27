@@ -10,6 +10,7 @@ gem 'sqlite3'
 group :development, :test do
   gem 'rspec-rails'
   gem 'pry-nav'
+  gem 'json-schema'
 end
 
 

@@ -6,6 +6,8 @@ describe 'zombies api', type: :request do
   end
 
   context 'when a get request is sent to "/zombies" URI' do
+
+
     context 'when the accepted content type is JSON' do
       it 'returns list of all zombies' do
         Zombie.create!(name: 'Ash', weapon: 'axe')
@@ -35,6 +37,26 @@ describe 'zombies api', type: :request do
       expect(response.status).to eq 200
       zombie = json(response.body)
       expect(zombie["name"]).to eq zombie_ash.name
+    end
+
+    it 'should be valid against the contract' do
+      schema = {
+        type: "object",
+        required: ["name", "weapon", "created_at", "updated_at", "id"],
+        properties: {
+          name: { type: "string" },
+          weapon: { type: "string" },
+          created_at: { type: "string" },
+          updated_at: { type: "string" },
+          id: { type: "integer" }
+        }
+      }
+
+      zombie_ash = Zombie.create!(name: 'Ash', weapon: 'axe')
+      get "/zombies/#{zombie_ash.id}"
+
+      expect(JSON::Validator.fully_validate(schema, response.body, strict: true)).to be_empty
+
     end
 
     context 'when querying zombies with a specific weapon' do
