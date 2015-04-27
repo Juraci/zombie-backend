@@ -6,13 +6,26 @@ describe 'zombies api', type: :request do
   end
 
   context 'when a get request is sent to "/zombies" URI' do
-    it 'returns list of all zombies' do
-      Zombie.create!(name: 'Ash', weapon: 'axe')
+    context 'when the accepted content type is JSON' do
+      it 'returns list of all zombies' do
+        Zombie.create!(name: 'Ash', weapon: 'axe')
 
-      get '/zombies'
+        get '/zombies', { format: 'json' }
 
-      expect(response.status).to eq 200
-      expect(response.body).to_not be_empty
+        expect(response.status).to eq 200
+        expect(response.content_type).to eq Mime::JSON
+      end
+    end
+
+    context 'when the accepted content type is XML' do
+      it 'returns list of all zombies' do
+        Zombie.create!(name: 'Ash', weapon: 'axe')
+
+        get '/zombies', { format: 'xml' }
+
+        expect(response.status).to eq 200
+        expect(response.content_type).to eq Mime::XML
+      end
     end
 
     it 'returns zombies by id' do
@@ -29,7 +42,7 @@ describe 'zombies api', type: :request do
         Zombie.create!(name: 'Ash', weapon: 'axe')
         Zombie.create!(name: 'John', weapon: 'shotgun')
 
-        get '/zombies?weapon=axe'
+        get '/zombies?weapon=axe', { format: 'json' }
 
         expect(response.status).to eq 200
         zombies = json(response.body).collect { |z| z["name"] }

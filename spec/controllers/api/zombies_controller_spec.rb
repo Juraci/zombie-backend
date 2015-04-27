@@ -7,17 +7,26 @@ describe API::ZombiesController, type: :controller do
     end
 
     it 'responds with 200' do
-      get :index
+      get :index, { format: 'json' }
       expect(response.status).to eq 200
     end
 
-    it 'responds with a JSON representation of zombies' do
-      get :index
-      expect(response.body).to eq([@zombie].to_json)
+    context 'when the content specifyied is JSON' do
+      it 'responds with a JSON representation of zombies' do
+        get :index, { format: 'json' }
+        expect(response.body).to eq([@zombie].to_json)
+      end
+    end
+
+    context 'when the content specifyied is XML' do
+      it 'responds with a XML representation of zombies' do
+        get :index, { format: 'xml' }
+        expect(response.body).to eq([@zombie].to_xml)
+      end
     end
 
     context 'when filtering the results by weapon' do
-      let!(:params) { { weapon: "axe" } }
+      let!(:params) { { weapon: 'axe', format: 'json' } }
 
       before :example do
         @zombie2 = Zombie.create!(name: 'John', weapon: 'shotgun')
