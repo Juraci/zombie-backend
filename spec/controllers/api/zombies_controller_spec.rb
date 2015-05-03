@@ -51,4 +51,13 @@ describe API::ZombiesController, type: :controller do
       expect(response.body).to eq(@zombie.to_json)
     end
   end
+
+  describe 'POST #create' do
+    it 'creates a zombie' do
+      params = { zombie: { name: 'Ash', weapon: 'axe' } }
+
+      post :create, params
+      expect(response.status).to eq 201
+    end
+  end
 end

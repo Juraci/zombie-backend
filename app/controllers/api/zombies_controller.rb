@@ -17,5 +17,18 @@ module API
       zombie = Zombie.find(params[:id])
       render json: zombie, status: 200
     end
+
+    def create
+      zombie = Zombie.new(zombie_params)
+      if zombie.save
+        render json: zombie, status: 201, location: api_zombie_url(zombie)
+      end
+    end
+
+    private
+
+    def zombie_params
+      params.require(:zombie).permit(:name, :weapon)
+    end
   end
 end

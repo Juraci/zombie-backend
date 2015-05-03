@@ -3,7 +3,11 @@ require 'rails_helper'
 describe 'zombies api', type: :request do
   before :example do
     host! 'api.example.com'
-    @schema = {
+  end
+
+  context 'when a get request is sent to "/zombies" URI' do
+    before :example do
+      @schema = {
         type: "object",
         required: ["name", "weapon", "created_at", "updated_at", "id"],
         properties: {
@@ -14,9 +18,7 @@ describe 'zombies api', type: :request do
           id: { type: "integer" }
         }
       }
-  end
-
-  context 'when a get request is sent to "/zombies" URI' do
+    end
 
     context 'when the accepted content type is JSON' do
       it 'returns list of all zombies' do
@@ -25,6 +27,7 @@ describe 'zombies api', type: :request do
         get '/zombies', { format: 'json' }
 
         expect(response.status).to eq 200
+        expect(response.content_type).to eq Mime::JSON
         expect(JSON::Validator.fully_validate(@schema, response.body, strict: true, list: true)).to be_empty
       end
     end
@@ -54,7 +57,6 @@ describe 'zombies api', type: :request do
       get "/zombies/#{zombie_ash.id}"
 
       expect(JSON::Validator.fully_validate(@schema, response.body, strict: true)).to be_empty
-
     end
 
     context 'when querying zombies with a specific weapon' do
@@ -69,6 +71,18 @@ describe 'zombies api', type: :request do
         expect(zombies).to include 'Ash'
         expect(zombies).to_not include 'John'
       end
+    end
+  end
+
+  context 'when a POST request is sent to "/zombies" URI' do
+    it 'creates a zombie' do
+      post '/zombies', { zombie: { name: 'Ash', weapon: 'axe' } }
+
+      expect(response.status).to eq 201
+      expect(response.content_type).to eq Mime::JSON
+
+      zombie = json(response.body)
+      expect(response.location).to eq api_zombie_url(zombie['id'])
     end
   end
 end
