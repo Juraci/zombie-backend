@@ -14,8 +14,12 @@ module API
     end
 
     def show
-      zombie = Zombie.find(params[:id])
-      render json: zombie, status: 200
+      begin
+        zombie = Zombie.find(params[:id])
+        render json: zombie, status: 200
+      rescue ActiveRecord::RecordNotFound
+        head 404, "content_type" => 'text/plain'
+      end
     end
 
     def create
@@ -26,6 +30,10 @@ module API
     end
 
     private
+
+    def not_found
+      head 404, "content_type" => 'text/plain'
+    end
 
     def zombie_params
       params.require(:zombie).permit(:name, :weapon)
